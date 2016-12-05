@@ -1,0 +1,12 @@
+<view class="header">
+  <view class="next">{{next}}</view>
+</view>
+<view class="content">
+  <image class="bg_img" src="../../images/WeChat_1.png" />
+  <image class="bg_elm" src="../../images/logo.png" />
+</view>
+<view class="footer weui-flex">
+  <view class="weui-flex__item" >云端</view>
+  <view class="weui-flex__item" >创建</view>
+  <view class="weui-flex__item" >本地</view>
+</view>

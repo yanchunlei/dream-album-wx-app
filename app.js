@@ -5,6 +5,13 @@ App({
     var logs = wx.getStorageSync('logs') || []
     logs.unshift(Date.now())
     wx.setStorageSync('logs', logs)
+    let that = this
+    wx.getSystemInfo({
+      success: function(res){
+        that.globalData.windowWidth = res.windowWidth;
+        that.globalData.windowHeight = res.windowHeight;
+      }
+    })
   },
   getUserInfo:function(cb){
     var that = this
@@ -25,6 +32,8 @@ App({
     }
   },
   globalData:{
-    userInfo:null
+    userInfo:null,
+    windowWidth: 0,
+    windowHeight: 0
   }
 })

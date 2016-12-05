@@ -1,0 +1,2 @@
+let pageData = {}
+Page(pageData)

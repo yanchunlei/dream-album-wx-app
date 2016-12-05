@@ -4,7 +4,7 @@
     <image class="userinfo-avatar" src="{{userInfo.avatarUrl}}" background-size="cover"></image>
     <text class="userinfo-nickname">{{userInfo.nickName}}</text>
   </view>
-  <view class="usermotto">
-    <text class="user-motto">{{motto}}</text>
-  </view>
+
+  <navigator url="../create/create" hover-class="navigator-hover">创建</navigator>
+  <navigator url="../preview/preview" hover-class="navigator-hover">预览</navigator>
 </view>
