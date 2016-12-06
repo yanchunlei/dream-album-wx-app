@@ -5,6 +5,7 @@
     <text class="userinfo-nickname">{{userInfo.nickName}}</text>
   </view>
 
-  <navigator url="../create/create" hover-class="navigator-hover">创建</navigator>
-  <navigator url="../preview/preview" hover-class="navigator-hover">预览</navigator>
+  <navigator url="../create/create" hover-class="navigator-hover">创建相册</navigator>
+  <navigator url="../preview/preview" hover-class="navigator-hover">预览模板</navigator>
+  <navigator url="../preview/preview?showonly=true" hover-class="navigator-hover">查看相册</navigator>
 </view>

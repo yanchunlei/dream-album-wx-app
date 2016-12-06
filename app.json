@@ -1,8 +1,9 @@
 {
   "pages":[
-    "pages/create/create",
-    "pages/preview/preview",
     "pages/index/index",
+    "pages/preview/preview",
+
+    "pages/create/create",
     "pages/logs/logs"
   ],
   "window":{

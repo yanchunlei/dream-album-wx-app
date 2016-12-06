@@ -1,4 +1,6 @@
 let debug = true;
+
+var app = getApp();
 let pageData = {
   data:{
     next:"下一步",
@@ -16,7 +18,7 @@ let pageData = {
     submodule.scale = this.scalex
   },
   init:function(index){
-    console.log(this.data.submodules)
+    // console.log(this.data.submodules)
     this.index = index;
     // init data
     let submodule = this.data.submodules[index]
@@ -72,7 +74,8 @@ let pageData = {
       next: next
     })
   },
-  onLoad: function(options){
+  onLoad: function(option){
+    console.log(option)
     let optionId = "moduleid";
     let that = this;
     wx.request({
@@ -88,32 +91,8 @@ let pageData = {
       },
       complete: function(res){
         if(!debug){return}
-        let resobj = {
-          title:"圣诞模板",
-          submodules:[{
-            bgsrc:"https://raw.githubusercontent.com/yanchunlei/res/master/crs/crs_1.png",
-            elesrc:"https://raw.githubusercontent.com/yanchunlei/res/master/ele/start0.png",
-            elecount: 0,
-            translatex:42,
-            translatey:100,
-            scale:1
-          },{
-            bgsrc:"https://raw.githubusercontent.com/yanchunlei/res/master/crs/crs_2.png",
-            elesrc:"https://raw.githubusercontent.com/yanchunlei/res/master/ele/start1.png",
-            elecount: 1,
-            translatex:42,
-            translatey:100,
-            scale:1
-          }
-          ,{
-            bgsrc:"https://raw.githubusercontent.com/yanchunlei/res/master/crs/crs_3.png",
-            elesrc:"https://raw.githubusercontent.com/yanchunlei/res/master/ele/start2.png",
-            elecount: 1,
-            translatex:42,
-            translatey:100,
-            scale:1
-          }]
-        }
+
+        let resobj = app.globalData.moduleobj;
         that.setData({
           submodules: resobj.submodules
         })

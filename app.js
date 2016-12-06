@@ -34,6 +34,32 @@ App({
   globalData:{
     userInfo:null,
     windowWidth: 0,
-    windowHeight: 0
+    windowHeight: 0,
+    moduleobj:{
+      title:"圣诞模板",
+      submodules:[{
+        bgsrc:"https://raw.githubusercontent.com/yanchunlei/res/master/crs/crs_1.png",
+        elesrc:"https://raw.githubusercontent.com/yanchunlei/res/master/ele/start0.png",
+        elecount: 1,
+        translatex:42,
+        translatey:100,
+        scale:1
+      },{
+        bgsrc:"https://raw.githubusercontent.com/yanchunlei/res/master/crs/crs_2.png",
+        elesrc:"https://raw.githubusercontent.com/yanchunlei/res/master/ele/start1.png",
+        elecount: 1,
+        translatex:42,
+        translatey:100,
+        scale:1
+      }
+      ,{
+        bgsrc:"https://raw.githubusercontent.com/yanchunlei/res/master/crs/crs_3.png",
+        elesrc:"https://raw.githubusercontent.com/yanchunlei/res/master/ele/start2.png",
+        elecount: 1,
+        translatex:42,
+        translatey:100,
+        scale:1
+      }]
+    }
   }
 })

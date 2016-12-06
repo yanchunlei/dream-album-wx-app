@@ -10,6 +10,6 @@
 </view>
 <view class="footer weui-flex" hidden ="{{hiddenfooter}}">
   <view class="weui-flex__item" >云端</view>
-  <view class="weui-flex__item" >创建</view>
+  <view class="weui-flex__item" bindtap="gocreate">创建</view>
   <view class="weui-flex__item" >本地</view>
 </view>
