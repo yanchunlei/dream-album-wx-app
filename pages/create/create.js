@@ -37,10 +37,7 @@ let pageData = {
     // touchstap, 用于间隔tap和touch时间
     this.lasttouchstap = Date.parse(new Date())
     // 用于在点击下一步时判断是否已经选择了照片
-    // this.choosed = elm_fnt?true:false;
-
-    // this.choosed = this.mostforward >= index
-    // this.choosed = elm_fnt?elm_fnt: this.choosed
+    
     this.choosed = elm_fnt || this.mostforward >=index
 
     this.animation = wx.createAnimation({
@@ -75,7 +72,7 @@ let pageData = {
     })
   },
   onLoad: function(option){
-    console.log(option)
+    // console.log(option)
     let optionId = "moduleid";
     let that = this;
     wx.request({

@@ -63,7 +63,7 @@ let pageData = {
   onLoad: function(option){
 
     let showonly = option.showonly
-    console.log(showonly)
+    // console.log(showonly)
     if(showonly == "true"){
       this.showonly = true
       this.setData({
