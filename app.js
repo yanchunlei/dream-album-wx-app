@@ -43,6 +43,7 @@ App({
         elecount: 1,
         translatex:42,
         translatey:100,
+        rotate:10,
         scale:1
       },{
         bgsrc:"https://raw.githubusercontent.com/yanchunlei/res/master/crs/crs_2.png",
@@ -50,6 +51,7 @@ App({
         elecount: 1,
         translatex:42,
         translatey:100,
+        rotate:4,
         scale:1
       }
       ,{
@@ -58,6 +60,7 @@ App({
         elecount: 1,
         translatex:42,
         translatey:100,
+        rotate:5,
         scale:1
       }]
     }

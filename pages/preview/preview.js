@@ -18,7 +18,7 @@ let pageData = {
     this.translatex = submodule.translatex;
     this.translatey = submodule.translatey;
     this.scalex = submodule.scale;
-    this.scaley = submodule.scaley;
+    this.scaley = submodule.scale;
     let elm_fnt = true
 
 
@@ -75,17 +75,18 @@ let pageData = {
     this.optionId = optionId;
     let that = this;
     wx.request({
-      url: "test.php",
+      url: "http://10.1.1.197:8080/dream-album/dream/album/common/getalbum.json",
       data:{
-        optionId: optionId
+        id: optionId
       },
       success:function(res){
-
+        console.log(res)
       },
       fail:function(res){
-
+        console.log(res)
       },
       complete: function(res){
+        console.log(res)
         if(!debug){return}
 
         let resobj = app.globalData.moduleobj;

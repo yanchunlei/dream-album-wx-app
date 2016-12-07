@@ -6,7 +6,7 @@
 
   <image class="bg_img" src="{{submodules[index].bgsrc}}"/>
   <image class="bg_elm" src="{{submodules[index].elesrc}}" animation ="{{animation}}" mode='aspectFit'/>
-  <view class="elm_fnt" animation = "{{animation}}" bindtouchstart="touchstart" bindtouchmove="touchmove" bindtouchend="touchend" bindtap="chooseImage" hidden="{{elm_fnt}}"/>
+  <view class="{{pressed?'elm_pressed':'elm_fnt'}}" animation = "{{animation}}" bindtouchstart="touchstart" bindtouchmove="touchmove" bindtouchend="touchend" bindtap="chooseImage" hidden="{{elm_fnt}}"/>
 </view>
 <view class="footer weui-flex" hidden ="{{hiddenfooter}}">
   <view class="weui-flex__item" >云端</view>

@@ -9,23 +9,32 @@ let pageData = {
     submodules:[],
     hiddenfooter: true,
     index:0,
-    elm_fnt: false  // 元素前面的控制view是否显示（首页不需要添加照片元素的页不显示）
+    elm_fnt: false,  // 元素前面的控制view是否显示（首页不需要添加照片元素的页不显示）
+    pressed: false
+  },
+  loadStorage: function(){
+    // 读取 storage中的数据
+    // mostforward, index, submodules
   },
   save: function(index){
+    // 点击下一步时保存数据
     let submodule = this.data.submodules[index];
     submodule.translatex = this.translatex
     submodule.translatey = this.translatey
     submodule.scale = this.scalex
+    submodule.rotate = this.rotate
   },
   init:function(index){
     // console.log(this.data.submodules)
     this.index = index;
     // init data
     let submodule = this.data.submodules[index]
+
     this.translatex = submodule.translatex;
     this.translatey = submodule.translatey;
     this.scalex = submodule.scale;
-    this.scaley = submodule.scaley;
+    this.scaley = submodule.scale;
+    this.rotate = submodule.rotate;
     let elm_fnt = submodule.elecount>0?false:true
 
     this.width = 300;
@@ -37,7 +46,7 @@ let pageData = {
     // touchstap, 用于间隔tap和touch时间
     this.lasttouchstap = Date.parse(new Date())
     // 用于在点击下一步时判断是否已经选择了照片
-    
+
     this.choosed = elm_fnt || this.mostforward >=index
 
     this.animation = wx.createAnimation({
@@ -47,7 +56,7 @@ let pageData = {
       transformOrigin: '50% 50% 0'
     })
     this.animation.translate(this.translatex, this.translatey)
-    .scale(this.scalex, this.scaley).step();
+    .scale(this.scalex, this.scaley).rotate(this.rotate).step();
 
     let backhidden = true;
     if(index >0){
@@ -71,33 +80,44 @@ let pageData = {
       next: next
     })
   },
+  requestcontinue: function(reqest_from){
+    this.mostforward = -1;
+    this.loadStorage();
+    this.init(0)
+    wx.hideToast()
+  },
   onLoad: function(option){
     // console.log(option)
     let optionId = "moduleid";
     let that = this;
+    wx.showToast({
+      title: "加载中",
+      icon: 'loading',
+      duration: 10000
+    })
     wx.request({
-      url: "test.php",
+      url: "http://10.1.1.197:8080/dream-album/dream/album/common/getalbum.json",
       data:{
-        optionId: optionId
+        id: optionId
       },
       success:function(res){
-
+        console.log(res)
       },
       fail:function(res){
-
+        console.log(res)
       },
       complete: function(res){
+        console.log(res)
         if(!debug){return}
 
         let resobj = app.globalData.moduleobj;
+        // console.log(resobj)
         that.setData({
           submodules: resobj.submodules
         })
+        that.requestcontinue(0)
       }
     })
-    this. mostforward = -1;
-    this.init(0)
-
   },
   onReady: function(){
 
@@ -110,12 +130,10 @@ let pageData = {
     }
     let that = this;
     let index = this.data.index;
-
     wx.chooseImage({
       sizeType:["original","compressed"],
       scourceType:["album","camera"],
       success: function(res){
-
         that.choosed = true;
         that.mostforward = index > that.mostforward? index: that. mostforward
         that.data.submodules[index].elesrc = res.tempFilePaths[0]
@@ -148,6 +166,9 @@ let pageData = {
 
   },
   touchstart: function(e){
+    this.setData({
+      pressed: true
+    })
     this.translate = false;
     this.scale = false;
     if(e.touches.length == 1){
@@ -165,7 +186,15 @@ let pageData = {
   touchend: function(e){
     this.translate = false;
     this.scale = false;
-
+    this.rotate = this.tmprotate;
+    this.setData({
+      pressed: false
+    })
+  },
+  angle: function(start,end){
+    let diff_x = end.pageX - start.pageX
+    let diff_y = end.pageY - start.pageY
+    return 360 * Math.atan(diff_y/diff_x)/(2*Math.PI);
   },
   touchmove: function(e){
     // touch step 用于间隔tap和 touch
@@ -204,9 +233,17 @@ let pageData = {
       if(scalerate * this.width > this.scalelimit){
         this.animation.scale((scalex+scaley)/2).step();
       }
+
+      let ang1 = this.angle(p0, p1)
+
+      let ang2 = this.angle(this.p0, this.p1)
+      this.tmprotate =this.rotate+ ang1-ang2
+      this.animation.rotate(this.tmprotate).step();
+
     }
     this.setData({
       animation:this.animation.export()
     })
-  }}
+  }
+}
 Page(pageData)
