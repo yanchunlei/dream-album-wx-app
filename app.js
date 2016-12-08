@@ -46,7 +46,7 @@ App({
         "editImgUrl": "http://10.1.1.197:8080/dream-album/images/1/detail/4.png",
         "previewImgUrl": "http://10.1.1.197:8080/dream-album/images/1/detail/4.png",
         "rank": 4,
-        "editImgInfos": "{}",
+        "editImgInfos": {width:320, height: 300, scale: 1, rotate: 3, positionX: 40, positionY: 110},
         "editTextInfos": "{}",
         "ok": true,
         "del": false
@@ -60,7 +60,7 @@ App({
         "editImgUrl": "http://10.1.1.197:8080/dream-album/images/1/detail/3.png",
         "previewImgUrl": "http://10.1.1.197:8080/dream-album/images/1/detail/3.png",
         "rank": 3,
-        "editImgInfos": "{}",
+        "editImgInfos": {width:320, height: 200, scale: 1, rotate: 4, positionX: 42, positionY: 100},
         "editTextInfos": "{}",
         "ok": true,
         "del": false
@@ -74,7 +74,7 @@ App({
         "editImgUrl": "http://10.1.1.197:8080/dream-album/images/1/detail/2.png",
         "previewImgUrl": "http://10.1.1.197:8080/dream-album/images/1/detail/2.png",
         "rank": 2,
-        "editImgInfos": "{}",
+        "editImgInfos": {width:320, height: 200, scale: 1, rotate: 4, positionX: 42, positionY: 100},
         "editTextInfos": "{}",
         "ok": true,
         "del": false

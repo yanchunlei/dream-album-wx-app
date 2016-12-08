@@ -12,17 +12,15 @@ let pageData = {
     elm_fnt: false,  // 元素前面的控制view是否显示（首页不需要添加照片元素的页不显示）
     pressed: false
   },
-  loadStorage: function(){
-    // 读取 storage中的数据
-    // mostforward, index, submodules
-  },
   save: function(index){
     // 点击下一步时保存数据
     let submodule = this.data.submodules[index];
     submodule.translatex = this.translatex
     submodule.translatey = this.translatey
-    submodule.scale = this.scalex
+    submodule.scalex = this.scalex
+    submodule.scaley = this.scaley
     submodule.rotate = this.rotate
+
 
     // 上传服务器：
     wx.uploadFile({
@@ -30,7 +28,7 @@ let pageData = {
       filePath: submodule.elesrc,
       name:'image',
       formData:{
-        userId:"abc",
+        userId:this.albumId,
         albumId:1,
         rank:index,
         positionX: this.translatex,
@@ -45,22 +43,20 @@ let pageData = {
     })
   },
   init:function(index){
-    // console.log(this.data.submodules)
     this.index = index;
     // init data
     let submodule = this.data.submodules[index]
 
     this.translatex = submodule.translatex;
     this.translatey = submodule.translatey;
-    this.scalex = submodule.scale;
-    this.scaley = submodule.scale;
+    this.scalex = submodule.scalex;
+    this.scaley = submodule.scaley;
     this.rotate = submodule.rotate;
+
     let elm_fnt = submodule.elecount>0?false:true
 
-    this.width = 300;
-    this.height = 200;
-    this.translateXlimit = 375 - this.width;
-    this.translateYlimit = 650 - this.height;
+    this.translateXlimit = 375 - this.width * this.scalex;
+    this.translateYlimit = 650 - this.height * this.scaley;
     this.scalelimit = 150;
 
     // touchstap, 用于间隔tap和touch时间
@@ -73,7 +69,7 @@ let pageData = {
       duration: 10,
       timingFunction: 'linear',
       delay: 0,
-      transformOrigin: '50% 50% 0'
+      transformOrigin: '0 0 0'
     })
     this.animation.translate(this.translatex, this.translatey)
     .scale(this.scalex, this.scaley).rotate(this.rotate).step();
@@ -102,7 +98,6 @@ let pageData = {
   },
   requestcontinue: function(request_from, res){
 
-    // console.log(resobj)
     if(request_from === 'getalbum'){
       this.getalbum = true
     }
@@ -125,13 +120,14 @@ let pageData = {
         this.mostforward = album.submodules.length;
       }else{
         this.mostforward = -1;
+        this.currentIndex = 0;
       }
-
-      console.log(albumModule)
       // 循环读取 albumModule中的数据
       let submodules = []
       if(albumModule.hasOwnProperty(submodules) && album.hasOwnProperty(submodules)){
-        for (let i = 0, let j = 0; i< albumModule.submodules.length&& j<album.submodules;){
+        let i = 0
+        let j = 0
+        while (i< albumModule.submodules.length && j<album.submodules.length){
           let subm1 = albumModule.submodules[i]
           let subm2 = album.submodules[j]
           if(subm1.rank === subm2.rank){
@@ -154,25 +150,36 @@ let pageData = {
         submodule.elesrc = amodule.userOriginImgUrl
         submodule.translatex = amodule.editImgInfos.positionX
         submodule.translatey = amodule.editImgInfos.positionY
-        submodule.translatey = amodule.editImgInfos.rotate
-        submodule.width = amodule.editImageInfos.width
-        submodule.height = admodule.editImageInfos.height
-        submodule.scale = admodule.editImageInfos.scale
-        submodule.rank = admodule.rank
+        submodule.rotate = amodule.editImgInfos.rotate
+        submodule.width = amodule.editImgInfos.width
+        submodule.height = amodule.editImgInfos.height
+
+        submodule.scalex = amodule.editImgInfos.width / this.width
+        submodule.scaley = amodule.editImgInfos.height / this.height
+        submodule.rank = amodule.rank
+        submodule.elecount = 1
         submodules.push(submodule)
       }
-      that.setData({
+
+      this.setData({
         submodules: submodules
       })
 
-      this.loadStorage();
-      this.init(0)
+      // this.loadStorage();
+      this.init(this.currentIndex)
       wx.hideToast()
     }
   },
+  beforeInit: function(option){
+    this.albumId = option.id;
+    this.userId = wx.getStorageSync('userId');
+    this.currentIndex = wx.getStorageSync("currentIndex")||0
+    this.width = 300;
+    this.height = 200;
+  },
   onLoad: function(option){
-    // console.log(option)
-    let optionId = "abc";
+    // let optionId = "abc";
+    this.beforeInit(option)
     let that = this;
     wx.showToast({
       title: "加载中",
@@ -184,7 +191,7 @@ let pageData = {
     wx.request({
       url:"http://10.1.1.197:8080/dream-album/dream/album/common/getalbum.json",
       data:{
-        id:optionId
+        id:this.albumId
       },
       success:function(res){
         console.log(res);
@@ -202,8 +209,8 @@ let pageData = {
     wx.request({
       url: "http://10.1.1.197:8080/dream-album/dream/album/common/startmakeuseralbum.json",
       data:{
-        userId: optionId,
-        albumId: 1
+        userId: this.albumId,
+        albumId: this.userId
       },
       success:function(res){
         console.log(res)
@@ -254,8 +261,8 @@ let pageData = {
     let index = this.data.index;
     let length = this.data.submodules.length;
 
+    this.save(index)
     if(index <length-1){
-      this.save(index)
       this.init(++index)
     }
   },
@@ -285,7 +292,14 @@ let pageData = {
   touchend: function(e){
     this.translate = false;
     this.scale = false;
-    this.rotate = this.tmprotate;
+
+    this.rotate = this.tmprotate == undefined? this.rotate: this.tmprotate;
+    this.scalex = this.tmpscalex == undefined? this.scalex: this.tmpscalex;
+    this.scaley = this.tmpscaley == undefined? this.scaley: this.tmpscaley;
+    this.tmprotate = undefined
+    this.tmpscalex = undefined
+    this.tmpscaley = undefined
+
     this.setData({
       pressed: false
     })
@@ -326,11 +340,11 @@ let pageData = {
 
     }else if(this.scale){
       let p1 = e.touches[1]
-      let scalex = (p1.pageX - p0.pageX)/(this.p1.pageX - this.p0.pageX)
-      let scaley = (p1.pageY - p0.pageY)/(this.p1.pageY - this.p0.pageY)
-      let scalerate = (scalex + scaley)/2
+      this.tmpscalex =this.scalex * (p1.pageX - p0.pageX)/(this.p1.pageX - this.p0.pageX)
+      this.tmpscaley =this.scaley * (p1.pageY - p0.pageY)/(this.p1.pageY - this.p0.pageY)
+      let scalerate = (this.tmpscalex + this.tmpscaley)/2
       if(scalerate * this.width > this.scalelimit){
-        this.animation.scale((scalex+scaley)/2).step();
+        this.animation.scale(this.tmpscalex, this.tmpscaley).step();
       }
 
       let ang1 = this.angle(p0, p1)
@@ -343,6 +357,12 @@ let pageData = {
     this.setData({
       animation:this.animation.export()
     })
+  },
+  onHide:function(){
+    wx.getStorageSync("currentIndex", this.currentIndex)
+  },
+  onUnload:function(){
+    wx.getStorageSync("currentIndex", this.currentIndex)
   }
 }
 Page(pageData)
