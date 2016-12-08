@@ -38,31 +38,47 @@ App({
     moduleobj:{
       title:"圣诞模板",
       submodules:[{
-        bgsrc:"https://raw.githubusercontent.com/yanchunlei/res/master/crs/crs_1.png",
-        elesrc:"https://raw.githubusercontent.com/yanchunlei/res/master/ele/start0.png",
-        elecount: 1,
-        translatex:42,
-        translatey:100,
-        rotate:10,
-        scale:1
-      },{
-        bgsrc:"https://raw.githubusercontent.com/yanchunlei/res/master/crs/crs_2.png",
-        elesrc:"https://raw.githubusercontent.com/yanchunlei/res/master/ele/start1.png",
-        elecount: 1,
-        translatex:42,
-        translatey:100,
-        rotate:4,
-        scale:1
-      }
-      ,{
-        bgsrc:"https://raw.githubusercontent.com/yanchunlei/res/master/crs/crs_3.png",
-        elesrc:"https://raw.githubusercontent.com/yanchunlei/res/master/ele/start2.png",
-        elecount: 1,
-        translatex:42,
-        translatey:100,
-        rotate:5,
-        scale:1
-      }]
+        "status": 0,
+        "updateTime": "2016-12-06 19:08:07",
+        "createTime": "2016-12-06 19:08:08",
+        "id": 4,
+        "albumId": 1,
+        "editImgUrl": "http://10.1.1.197:8080/dream-album/images/1/detail/4.png",
+        "previewImgUrl": "http://10.1.1.197:8080/dream-album/images/1/detail/4.png",
+        "rank": 4,
+        "editImgInfos": "{}",
+        "editTextInfos": "{}",
+        "ok": true,
+        "del": false
+    },
+    {
+        "status": 0,
+        "updateTime": "2016-12-06 19:07:45",
+        "createTime": "2016-12-06 19:07:46",
+        "id": 3,
+        "albumId": 1,
+        "editImgUrl": "http://10.1.1.197:8080/dream-album/images/1/detail/3.png",
+        "previewImgUrl": "http://10.1.1.197:8080/dream-album/images/1/detail/3.png",
+        "rank": 3,
+        "editImgInfos": "{}",
+        "editTextInfos": "{}",
+        "ok": true,
+        "del": false
+    },
+    {
+        "status": 0,
+        "updateTime": "2016-12-06 19:07:25",
+        "createTime": "2016-12-06 19:07:27",
+        "id": 2,
+        "albumId": 1,
+        "editImgUrl": "http://10.1.1.197:8080/dream-album/images/1/detail/2.png",
+        "previewImgUrl": "http://10.1.1.197:8080/dream-album/images/1/detail/2.png",
+        "rank": 2,
+        "editImgInfos": "{}",
+        "editTextInfos": "{}",
+        "ok": true,
+        "del": false
+    }]
     }
   }
 })

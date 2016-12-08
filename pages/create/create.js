@@ -23,6 +23,26 @@ let pageData = {
     submodule.translatey = this.translatey
     submodule.scale = this.scalex
     submodule.rotate = this.rotate
+
+    // 上传服务器：
+    wx.uploadFile({
+      url:"http://10.1.1.197:8080/dream-album/dream/album/common/uploadalbumpage.json",
+      filePath: submodule.elesrc,
+      name:'image',
+      formData:{
+        userId:"abc",
+        albumId:1,
+        rank:index,
+        positionX: this.translatex,
+        positionY: this.translatey,
+        rotate:this.rotate,
+        width:this.scalex * this.width,
+        height:this.scaley * this.height
+      },
+      success: function(res){
+        console.log(res)
+      }
+    })
   },
   init:function(index){
     // console.log(this.data.submodules)
@@ -80,25 +100,110 @@ let pageData = {
       next: next
     })
   },
-  requestcontinue: function(reqest_from){
-    this.mostforward = -1;
-    this.loadStorage();
-    this.init(0)
-    wx.hideToast()
+  requestcontinue: function(request_from, res){
+
+    // console.log(resobj)
+    if(request_from === 'getalbum'){
+      this.getalbum = true
+    }
+    if(request_from === 'startmakeuseralbum'){
+      this.startmakeuseralbum = true
+    }
+    if(this.getalbum && this.startmakeuseralbum){
+
+      let albumModule = app.globalData.moduleobj;
+
+      let album = {}
+      function sortModule(am1, am2){
+        return am1.rank - am2.rank
+      }
+      if(albumModule.hasOwnProperty(submodules)){
+        albumModule.submodules.sort(sorModule)
+      }
+      if(album.hasOwnProperty(submodules)){
+        album.submodules.sort(sorModule)
+        this.mostforward = album.submodules.length;
+      }else{
+        this.mostforward = -1;
+      }
+
+      console.log(albumModule)
+      // 循环读取 albumModule中的数据
+      let submodules = []
+      if(albumModule.hasOwnProperty(submodules) && album.hasOwnProperty(submodules)){
+        for (let i = 0, let j = 0; i< albumModule.submodules.length&& j<album.submodules;){
+          let subm1 = albumModule.submodules[i]
+          let subm2 = album.submodules[j]
+          if(subm1.rank === subm2.rank){
+            subm1.userOriginImgUrl = subm2.userOriginImgUrl
+            subm1.editImageInfos = subm2.editImageInfos
+            i++
+            j++
+          }
+          if(subm1.rank < subm2.rank){
+            i++
+          }
+          if(subm1.rank > subm2.rank){
+            j++
+          }
+        }
+      }
+      for(let amodule of albumModule.submodules){
+        let submodule = {}
+        submodule.bgsrc = amodule.editImgUrl;
+        submodule.elesrc = amodule.userOriginImgUrl
+        submodule.translatex = amodule.editImgInfos.positionX
+        submodule.translatey = amodule.editImgInfos.positionY
+        submodule.translatey = amodule.editImgInfos.rotate
+        submodule.width = amodule.editImageInfos.width
+        submodule.height = admodule.editImageInfos.height
+        submodule.scale = admodule.editImageInfos.scale
+        submodule.rank = admodule.rank
+        submodules.push(submodule)
+      }
+      that.setData({
+        submodules: submodules
+      })
+
+      this.loadStorage();
+      this.init(0)
+      wx.hideToast()
+    }
   },
   onLoad: function(option){
     // console.log(option)
-    let optionId = "moduleid";
+    let optionId = "abc";
     let that = this;
     wx.showToast({
       title: "加载中",
       icon: 'loading',
       duration: 10000
     })
+    this.getalbum = false
+    this.startmakeuseralbum = false
     wx.request({
-      url: "http://10.1.1.197:8080/dream-album/dream/album/common/getalbum.json",
+      url:"http://10.1.1.197:8080/dream-album/dream/album/common/getalbum.json",
       data:{
-        id: optionId
+        id:optionId
+      },
+      success:function(res){
+        console.log(res);
+      },
+      fail: function(res){
+        console.log(res);
+      },
+      complete: function(res){
+        console.log(res);
+        if(!debug){return}
+        that.requestcontinue("getalbum", res)
+      }
+    })
+
+    wx.request({
+      url: "http://10.1.1.197:8080/dream-album/dream/album/common/startmakeuseralbum.json",
+      data:{
+        userId: optionId,
+        albumId: 1
       },
       success:function(res){
         console.log(res)
@@ -109,13 +214,7 @@ let pageData = {
       complete: function(res){
         console.log(res)
         if(!debug){return}
-
-        let resobj = app.globalData.moduleobj;
-        // console.log(resobj)
-        that.setData({
-          submodules: resobj.submodules
-        })
-        that.requestcontinue(0)
+        that.requestcontinue("startmakeuseralbum", res)
       }
     })
   },
