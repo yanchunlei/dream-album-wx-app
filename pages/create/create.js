@@ -213,7 +213,7 @@ let pageData = {
   },
   beforeInit: function(option){
     // 读取传入和本地数据
-    this.albumId = option.id;
+    this.albumId = option.albumId;
     this.userId = wx.getStorageSync('userId');
     // 虚拟默认值
     this.albumId = 1
