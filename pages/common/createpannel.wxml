@@ -1,14 +1,21 @@
-<view class="header">
+<view class="header" hidden="true">
   <view class="next" bindtap="next">{{next}}</view>
   <view class="back" bindtap="back" hidden="{{backhidden}}" >{{back}}</view>
 </view>
-<view class="content" >
-
-  <image class="bg_img" src="{{submodules[index].bgsrc}}"/>
+<view class="content" style="width:{{contentWidth}};height:{{contentHeight}};">
+  <image class="bg_img" animation = "{{anim_bg}}" style="width:{{bgWidth}};height:{{bgHeight}};" src="{{submodules[index].bgsrc}}"/>
   <image class="bg_elm" src="{{submodules[index].elesrc}}" animation ="{{animation}}" mode='aspectFit'/>
-  <view class="{{pressed?'elm_pressed':'elm_fnt'}}" animation = "{{animation}}" bindtouchstart="touchstart" bindtouchmove="touchmove" bindtouchend="touchend" bindtap="chooseImage" hidden="{{elm_fnt}}"/>
+  <!--class="{{choosed?'elm_choosed':(pressed?'elm_pressed':'elm_fnt')}}"-->
+  <view class="{{choosed?'':(pressed?'elm_fnt':'elm_fnt')}}" animation = "{{animation}}" bindtouchstart="touchstart" bindtouchmove="touchmove" bindtouchend="touchend" bindtap="chooseImage" hidden="{{elm_fnt}}">
+    <view class="{{choosed?'':'plus_icon'}}" animation="{{anim_icon}}"/>
+  </view>
 </view>
-<view class="footer weui-flex" hidden ="{{hiddenfooter}}">
+<view class="footer2">
+<button class="footer2_item" catchtap="back">{{back}}</button>
+<button class="footer2_item" catchtap="next">{{next}}</button>
+</view>
+<view class="footer weui-flex" hidden ="true">
+  <!--hidden ="{{hiddenfooter}}"-->
   <view class="weui-flex__item" >云端</view>
   <view class="weui-flex__item" bindtap="gocreate">创建</view>
   <view class="weui-flex__item" >本地</view>

@@ -1,0 +1,59 @@
+创建和预览相册
+接口：
+/**
+ * 1、根据相册id返回相册模版子列表接口
+ * create 页面加载时请求（onLoad）
+ * @param id
+ * @return
+ */
+
+ url : http://10.1.1.197:8080/dream-album/dream/album/common/getalbum.json
+
+
+
+ /**
+  * 2、用户点击开始制作创建的用户相册信息数据
+  * create 页面加载时请求（onLoad）
+  * 若第一次制作则添加制作信息
+  *
+  * 若存在制作中的记录则返回item操作历史
+  *
+  * @param userId
+  * @param albumId
+  */
+
+ url : http://10.1.1.197:8080/dream-album/dream/album/common/startmakeuseralbum.json
+
+如上两个接口都在create 页面加载时请求（onLoad）
+使用 如下两个标记变量：
+this.getalbum = false
+this.startmakeuseralbum = false
+
+this.choosed: 该字段用于判断当前页是否已选中图片，
+  next方法中判断，如果没有选中则不让进入下一页，以去掉
+submodule.choosed: 对每个页面添加choosed字段，
+  用于最后制作时的判断，如果有没有上传的将提示
+
+  this.albumId = 1
+  this.userId = "abc"
+  虚拟默认值
+
+  
+
+
+
+ /**
+  * 3、上传相册item操作数据记录的接口
+  *
+  * @param image  -->上传的图片文件name
+  * @param userId
+  * @param albumId
+  * @param rank
+  * @param positionX
+  * @param positionY
+  * @param rotate
+  * @param width
+  * @param height
+  */
+
+  url : http://10.1.1.197:8080/dream-album/dream/album/common/uploadalbumpage.json
