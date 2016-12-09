@@ -2,11 +2,17 @@
   <view class="next" bindtap="next">{{next}}</view>
   <view class="back" bindtap="back" hidden="{{backhidden}}" >{{back}}</view>
 </view>
-<view class="content" >
+<view class="content"  bindtouchstart="containerstart" bindtouchmove="containermove" bindtouchend="containerend">
+  <view style="position:absolute;width:{{cont_width}};height:{{cont_height}}" animation="{{container_animation}}">
+    <image class="bg_img" style="width:{{cont_width}};height:{{cont_height}}" src="{{submodules[index].bgsrc}}"/>
+    <image class="bg_elm" src="{{submodules[index].elesrc}}" animation ="{{animation}}" mode='aspectFit'/>
+    <view class="{{pressed?'elm_pressed':'elm_fnt'}}" animation = "{{animation}}" catchtouchstart="touchstart" catchtouchmove="touchmove" catchtouchend="touchend" catchtap="chooseImage" hidden="{{elm_fnt}}"/>
+  </view>
+  <view style="position:absolute;width:{{cont_width}};height:{{cont_height}}" animation="{{container_animation_right}}" hidden="true" >
+    <image class="bg_img" style="width:{{cont_width}};height:{{cont_height}}" src="{{submodules[index].bgsrc}}"/>
+    <image class="bg_elm" src="{{submodules[index].elesrc}}" animation ="{{animation}}" mode='aspectFit'/>
 
-  <image class="bg_img" src="{{submodules[index].bgsrc}}"/>
-  <image class="bg_elm" src="{{submodules[index].elesrc}}" animation ="{{animation}}" mode='aspectFit'/>
-  <view class="{{pressed?'elm_pressed':'elm_fnt'}}" animation = "{{animation}}" bindtouchstart="touchstart" bindtouchmove="touchmove" bindtouchend="touchend" bindtap="chooseImage" hidden="{{elm_fnt}}"/>
+  </view>
 </view>
 <view class="footer weui-flex" hidden ="{{hiddenfooter}}">
   <view class="weui-flex__item" >云端</view>

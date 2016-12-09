@@ -33,8 +33,8 @@ App({
   },
   globalData:{
     userInfo:null,
-    windowWidth: 0,
-    windowHeight: 0,
+    windowWidth: 400,
+    windowHeight: 600,
     moduleobj:{
       title:"圣诞模板",
       submodules:[{

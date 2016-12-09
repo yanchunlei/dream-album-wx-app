@@ -10,7 +10,9 @@ let pageData = {
     hiddenfooter: true,
     index:0,
     elm_fnt: false,  // 元素前面的控制view是否显示（首页不需要添加照片元素的页不显示）
-    pressed: false
+    pressed: false,
+    cont_width: '',
+    cont_height: ''
   },
   save: function(index){
     // 点击下一步时保存数据
@@ -20,7 +22,6 @@ let pageData = {
     submodule.scalex = this.scalex
     submodule.scaley = this.scaley
     submodule.rotate = this.rotate
-
 
     // 上传服务器：
     wx.uploadFile({
@@ -71,6 +72,18 @@ let pageData = {
       delay: 0,
       transformOrigin: '0 0 0'
     })
+    this.container_animation = wx.createAnimation({
+      duration: 0,
+      timingFunction: 'linear',
+      delay: 0,
+      transformOrigin: '0 0 0'
+    })
+    this.container_animation_right = wx.createAnimation({
+      duration: 0,
+      timingFunction: 'linear',
+      delay: 0,
+      transformOrigin: '0 0 0'
+    })
     this.animation.translate(this.translatex, this.translatey)
     .scale(this.scalex, this.scaley).rotate(this.rotate).step();
 
@@ -87,13 +100,17 @@ let pageData = {
       next="下一步"
     }
 
+    this.container_animation_right.translate(this.cont_width,0).step()
     // 设置数据：
     this.setData({
       index: this.index,
       backhidden: backhidden,
       animation:this.animation.export(),
+      container_animation_right: this.container_animation_right.export(),
       elm_fnt: elm_fnt,
-      next: next
+      next: next,
+      cont_width: this.cont_width+"px",
+      cont_height: this.cont_height+"px"
     })
   },
   requestcontinue: function(request_from, res){
@@ -132,7 +149,7 @@ let pageData = {
           let subm2 = album.submodules[j]
           if(subm1.rank === subm2.rank){
             subm1.userOriginImgUrl = subm2.userOriginImgUrl
-            subm1.editImageInfos = subm2.editImageInfos
+            subm1.previewImgUrl = subm2.editImageInfos
             i++
             j++
           }
@@ -147,7 +164,7 @@ let pageData = {
       for(let amodule of albumModule.submodules){
         let submodule = {}
         submodule.bgsrc = amodule.editImgUrl;
-        submodule.elesrc = amodule.userOriginImgUrl
+        submodule.elesrc = amodule.previewImgUrl
         submodule.translatex = amodule.editImgInfos.positionX
         submodule.translatey = amodule.editImgInfos.positionY
         submodule.rotate = amodule.editImgInfos.rotate
@@ -176,6 +193,8 @@ let pageData = {
     this.currentIndex = wx.getStorageSync("currentIndex")||0
     this.width = 300;
     this.height = 200;
+    this.cont_width = app.globalData.windowWidth
+    this.cont_height = app.globalData.windowHeight
   },
   onLoad: function(option){
     // let optionId = "abc";
@@ -363,6 +382,23 @@ let pageData = {
   },
   onUnload:function(){
     wx.getStorageSync("currentIndex", this.currentIndex)
+  },
+  containerstart: function(e){
+    this.containerP = e.touches[0]
+  },
+  containermove: function(e){
+    let p = e.touches[0]
+    let movx = p.pageX- this.containerP.pageX
+    this.container_animation.translate(movx, 0).step()
+    this.setData({
+      container_animation: this.container_animation.export()
+    })
+  },
+  containerend: function(e){
+    this.container_animation.translate(0, 0).step()
+    this.setData({
+      container_animation: this.container_animation.export()
+    })
   }
 }
 Page(pageData)
