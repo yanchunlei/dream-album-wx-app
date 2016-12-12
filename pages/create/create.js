@@ -1,4 +1,4 @@
-let debug = false;
+let debug = true;
 
 var app = getApp();
 let pageData = {
@@ -290,7 +290,7 @@ let pageData = {
       },
       fail: function(res){
         console.log("getalbum", res);
-        that.requestfailed(res)
+        // that.requestfailed(res)
       },
       complete: function(res){
         if(!debug){return}
@@ -310,7 +310,7 @@ let pageData = {
       },
       fail:function(res){
         console.log("startmakeuseralbum", res)
-        that.requestfailed(res)
+        // that.requestfailed(res)
       },
       complete: function(res){
         if(!debug){return}
