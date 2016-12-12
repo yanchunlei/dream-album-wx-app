@@ -1,4 +1,4 @@
-let debug = false;
+let debug = true;
 
 var app = getApp();
 let pageData = {
@@ -31,12 +31,21 @@ let pageData = {
         filePath: submodule.elesrc,
         name: 'image',
         formData: {
+          id:"id",// 用户模板的id
+          albumItemId :'',// 相册 某一页的id
+          cssMoveX :"",
+          cssMoveY :"",
+          cssRotate:"",
+          cssImgWidth:"",
+          cssImgHeight:"",
+          bgImgWidth:"",
+          bgImgHeight:"",
           // 'userId': this.userId,
           // 'albumId': this.albumId,
           // 'rank': submodule.rank,
-          'userAlbumId': "" + this.data.userAlbumId,
-          'imgCssInfo': "",
-          'albumItemId': "" + submodule.id,
+            // 'userAlbumId': "" + this.data.userAlbumId,
+            // 'imgCssInfo': "",
+            // 'albumItemId': "" + submodule.id,
           // 'positionX': submodule.translatex,
           // 'positionY': submodule.translatey,
           // 'rotate': submodule.rotate,
@@ -125,41 +134,49 @@ let pageData = {
     this.setData({
       index: this.index,
       backhidden: backhidden,
-      animation:this.animation.export(),
+      animation: this.animation.export(),
       anim_icon: this.anim_icon.export(),
+      anim_bg: this.anim_bg.export(),
       elm_fnt: elm_fnt,
       next: next,
       contentWidth: (this.windowWidth * 0.9)+"px",
       contentHeight: (this.windowHeight * 0.9)+"px",
-      bgWidth:(this.windowWidth-80)+"px",
+      bgWidth: (this.windowWidth-80)+"px",
       bgHeight: (this.windowHeight-100)+"px",
-      anim_bg: this.anim_bg.export(),
       choosed: this.choosed
     })
   },
   requestcontinue: function(res){
-    this.albumModule = res.data.albumItemInfos;
-    // this.album = res.data.userAlbumItemInfos;    
-      // let albumModule = app.globalData.moduleobj;
+    // 构建模拟数据
+    res = app.globalData.mkuser
+
+    // 处理res返回的数据
+    this.albumModule = res.albumItemInfos
+    this.album = res.userAlbumItemInfos
+
+    // 获取index
+    this.currentIndex = res.userAlbumInfo.step
+    console.log(this.currentIndex)
+
+    // 按处理好的数据继续操作
     let albumModule = this.albumModule;
 
-    let album = res.data.userAlbumItemInfos;
+    let album = this.album;
     function sortModule(am1, am2){
       return am1.rank - am2.rank;
     }
     if(albumModule.length >0){
-      albumModule.sort(sortModule);
+      albumModule.sort(sortModule)
     }
-    if(album!= 'undefined' && album.length >0){
+    if(album != 'undefined' && album.length >0){
       album.sort(sortModule)
       this.mostforward = album.length;
     }else{
       album = [];
       this.mostforward = -1;
-      this.currentIndex = 0;
     }
+
     // 循环读取 albumModule中的数据
-    let submodules = []
     if(albumModule.length >0 && album.length >0){
       let i = 0
       let j = 0
@@ -168,7 +185,7 @@ let pageData = {
         let subm2 = album[j]
         if(subm1.rank === subm2.rank){
           subm1.userOriginImgUrl = subm2.userOriginImgUrl
-          subm1.editImageInfos = subm2.editImageInfos
+          subm1.editElmInfos = subm2.editImgInfos
           i++
           j++
         }
@@ -180,6 +197,8 @@ let pageData = {
         }
       }
     }
+    console.log("albumModule", albumModule)
+    let submodules = []
     for(let amodule of albumModule){
       let submodule = {}
       submodule.bgsrc = amodule.editImgUrl;
@@ -187,10 +206,13 @@ let pageData = {
       if(submodule.elesrc == undefined || submodule.elesrc == ""){
         submodule.elesrc = amodule.previewImgUrl
       }
-      let editImgInfos = JSON.parse(amodule.editImgInfos)
-      submodule.translatex = editImgInfos.positionX
-      submodule.translatey = editImgInfos.positionY
-      submodule.rotate = editImgInfos.rotate
+      submodule.imgOriWidth = amodule.imgWidth
+      submodule.imgOriHeight = amodule.imgHeight
+
+      let editImgInfos = this.convertEditImgInfos(false, true, amodule.editImageInfos, submodule.imgOriWidth ,submodule.imgOriHeight)
+      submodule.translatex = editImgInfos.cssElmMoveX
+      submodule.translatey = editImgInfos.cssElmMoveY
+      submodule.rotate = editImgInfos.cssElmRotate
 
       submodule.width = editImgInfos.width
       submodule.height = editImgInfos.height
@@ -213,20 +235,25 @@ let pageData = {
     wx.hideToast()
   },
   beforeInit: function(option){
+    console.log("beforeInit", option)
     // 读取传入和本地数据
     this.albumId = option.albumId;
-    // this.usrAlbumId = option.userAlbumId;
     this.userId = wx.getStorageSync('userId');
-    
-    this.currentIndex = wx.getStorageSync("currentIndex")||0
+
+    // this.currentIndex (step)直接取线上数据，不保留本地
+    // this.currentIndex = wx.getStorageSync("currentIndex")||0
 
     this.width = 300;
     this.height = 200;
     this.windowWidth = app.globalData.windowWidth;
     this.windowHeight = app.globalData.windowHeight;
     //设置bg图片的位置 周围的预留边界
-    this.bg_tr_x = 40
-    this.bg_tr_y = 40
+    this.margin_top = 40;
+    this.margin_left = 40;
+    this.margin_right = 40;
+    this.margin_bottom = 60;
+    this.bg_tr_x = this.margin_left
+    this.bg_tr_y = this.margin_top
   },
   requestfailed: function(res){
     wx.showModal({
@@ -235,6 +262,29 @@ let pageData = {
     })
     wx.hideToast()
   },
+  convertEditImgInfos: function(is2Ori,needConvert2Obj, editImgInfos, oriBgWidth, oriBgHeight){
+    // is2Ori: true:phone size 转换 ori size; false: ori size 转换为phone size
+    // needConvert2Obj: true: 传入的editImgInfos为字符串，需转换为obj对象，否则不需要
+    if(needConvert2Obj){
+      editImgInfos = JSON.parse(editImgInfos)
+    }
+    let bgPhWidth = this.windowWidth - this.margin_left - this.margin_right
+    let bgPhHeight = this.windowHeight - this.margin_top - this.margin_bottom
+    let scalex = oriBgWidth / bgPhWidth
+    let scaley = oriBgHeight/ bgPhHeight
+    let newEII = {}
+    if(is2Ori){
+        newEII.cssElmWidth = editImgInfos.cssElmWidth * scalex
+        newEII.cssElmHeight = editImgInfos.cssElmHeight *scaley
+        newEII.cssElmMoveX = editImgInfos.cssElmMoveX * scalex
+        newEII.cssElmMoveY = editImgInfos.cssElmMoveY * scaley
+    }else{
+        newEII.cssElmWidth = editImgInfos.cssElmWidth / scalex
+        newEII.cssElmHeight = editImgInfos.cssElmHeight /scaley
+        newEII.cssElmMoveX = editImgInfos.cssElmMoveX / scalex
+        newEII.cssElmMoveY = editImgInfos.cssElmMoveY / scaley
+    }
+  }
   onLoad: function(option){
     // let optionId = "abc";
     this.beforeInit(option)
@@ -246,42 +296,27 @@ let pageData = {
     })
     this.getalbum = false
     this.startmakeuseralbum = false
-    // wx.request({
-    //   url:"https://api.mokous.com/wx/dream/album/common/getalbum.json",
-    //   data:{
-    //     id:this.albumId
-    //   },
-    //   success:function(res){
-    //     console.log("getalbum", res);
-    //     that.requestcontinue( res)
-    //   },
-    //   fail: function(res){
-    //     console.log("getalbum", res);
-    //     that.requestfailed(res)
-    //   },
-    //   complete: function(res){
-    //     if(!debug){return}
-    //     // that.requestcontinue("getalbum", res)
-    //   }
-    // })
   //Modify TODO
     wx.request({
-      url: "https://api.mokous.com/wx/dream/album/common/startmakeuseralbum.json",
+      url: "http://10.1.0.121:8080/dream-album/dream/album/common/startmakeuseralbum.json",
       data:{
         albumId: this.albumId,
         userId: this.userId
       },
       success:function(res){
-        console.log("startmakeuseralbum", res)
+        console.log("success", res)
+        if(debug){return}
         that.requestcontinue(res)
       },
       fail:function(res){
-        console.log("startmakeuseralbum", res)
+        console.log("failed", res)
+        if(debug){return}
         that.requestfailed(res)
       },
       complete: function(res){
-        // if(!debug){return}
-        // that.requestcontinue("startmakeuseralbum", res)
+        console.log("complete", res)
+        if(!debug){return}
+        that.requestcontinue(res)
       }
     })
   },
@@ -303,7 +338,7 @@ let pageData = {
         that.choosed = true;
         that.mostforward = index > that.mostforward? index: that. mostforward
         that.data.submodules[index].elesrc = res.tempFilePaths[0]
-        that.data.submodules[index].userImg = res.tempFilePaths[0]        
+        that.data.submodules[index].userImg = res.tempFilePaths[0]
         that.data.submodules[index].choosed = true
         that.setData({
           submodules: that.data.submodules,
@@ -446,10 +481,10 @@ let pageData = {
     })
   },
   onHide:function(){
-    wx.getStorageSync("currentIndex", this.currentIndex)
+    // wx.getStorageSync("currentIndex", this.currentIndex)
   },
   onUnload:function(){
-    wx.getStorageSync("currentIndex", this.currentIndex)
+    // wx.getStorageSync("currentIndex", this.currentIndex)
   }
 }
 Page(pageData)
