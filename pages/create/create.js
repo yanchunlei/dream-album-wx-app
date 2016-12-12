@@ -1,10 +1,10 @@
-let debug = true;
+let debug = false;
 
 var app = getApp();
 let pageData = {
   data:{
     next:"下一步",
-    back:"返回",
+    back:"上一步",
     backhidden: true,
     submodules:[],
     hiddenfooter: true,
@@ -17,47 +17,51 @@ let pageData = {
   save: function(index){
     // 点击下一步时保存数据
     let submodule = this.data.submodules[index];
-    submodule.translatex = this.translatex
-    submodule.translatey = this.translatey
+    submodule.translatex = this.translatex-40
+    submodule.translatey = this.translatey-40
     submodule.scalex = this.scalex
     submodule.scaley = this.scaley
     submodule.rotate = this.rotate
-
     // 上传服务器：
-    wx.uploadFile({
-      url:"http://10.1.1.197:8080/dream-album/dream/album/common/uploadalbumpage.json",
-      filePath: submodule.elesrc,
-      name:'image',
-      formData:{
-        userId:this.albumId,
-        albumId:1,
-        rank:index,
-        positionX: this.translatex,
-        positionY: this.translatey,
-        rotate:this.rotate,
-        width:this.scalex * this.width,
-        height:this.scaley * this.height
-      },
-      success: function(res){
-        console.log(res)
-      }
-    })
+    if(submodule.choosed){
+      wx.uploadFile({
+        url:"http://10.1.1.197:8080/dream-album/dream/album/common/uploadalbumpage.json",
+        filePath: submodule.elesrc,
+        name:'image',
+        formData:{
+          userId: this.userId,
+          albumId: this.albumId,
+          rank: submodule.rank,
+          positionX: submodule.translatex,
+          positionY: submodule.translatey,
+          rotate: submodule.rotate,
+          width: submodule.scalex * this.width,
+          height: submodule.scaley * this.height,
+          bgWidth: this.windowWidth-80,
+          bgHeight: this.windowHeight-100,
+          isMadeStatus: index == this.data.submodules.length-1?1:0
+        },
+        success: function(res){
+          console.log(res)
+        }
+      })
+    }
   },
   init:function(index){
     this.index = index;
     // init data
     let submodule = this.data.submodules[index]
 
-    this.translatex = submodule.translatex;
-    this.translatey = submodule.translatey;
+    this.translatex = submodule.translatex +40;
+    this.translatey = submodule.translatey +40;
     this.scalex = submodule.scalex;
     this.scaley = submodule.scaley;
     this.rotate = submodule.rotate;
 
     let elm_fnt = submodule.elecount>0?false:true
 
-    this.translateXlimit = 375 - this.width * this.scalex;
-    this.translateYlimit = 650 - this.height * this.scaley;
+    this.translateXlimit = this.windowWidth - this.width * this.scalex -40;
+    this.translateYlimit = this.windowHeight - this.height * this.scaley -40-60;
     this.scalelimit = 150;
 
     // touchstap, 用于间隔tap和touch时间
@@ -72,14 +76,18 @@ let pageData = {
       delay: 0,
       transformOrigin: '0 0 0'
     })
+
     this.container_animation = wx.createAnimation({
       duration: 0,
+
       timingFunction: 'linear',
       delay: 0,
       transformOrigin: '0 0 0'
     })
+
     this.container_animation_right = wx.createAnimation({
       duration: 0,
+
       timingFunction: 'linear',
       delay: 0,
       transformOrigin: '0 0 0'
@@ -101,52 +109,78 @@ let pageData = {
     }
 
     this.container_animation_right.translate(this.cont_width,0).step()
+// >>>>>>> v02
+    // this.anim_bg.translate(this.bg_tr_x, this.bg_tr_y).step()
+    //
+    // let fnt_view_width = this.width * this.scalex;
+    // let fnt_view_height = this.height * this.scaley;
+    // let trans_x = (fnt_view_width - 30)/2
+    // let trans_y = (fnt_view_height- 80)/2
+    //
+    // this.anim_icon.translate(trans_x, trans_y).rotate(-this.rotate).step()
+
+
     // 设置数据：
     this.setData({
       index: this.index,
       backhidden: backhidden,
       animation:this.animation.export(),
+
       container_animation_right: this.container_animation_right.export(),
       elm_fnt: elm_fnt,
       next: next,
       cont_width: this.cont_width+"px",
       cont_height: this.cont_height+"px"
+// >>>>>>> v02
+//       anim_icon: this.anim_icon.export(),
+//       elm_fnt: elm_fnt,
+//       next: next,
+//       contentWidth: (this.windowWidth)+"px",
+//       contentHeight: (this.windowHeight-60)+"px",
+//       bgWidth:(this.windowWidth-80)+"px",
+//       bgHeight: (this.windowHeight-100)+"px",
+//       anim_bg: this.anim_bg.export(),
+//       choosed: this.choosed
+
     })
   },
   requestcontinue: function(request_from, res){
 
     if(request_from === 'getalbum'){
       this.getalbum = true
+      this.albumModule = res.data
     }
     if(request_from === 'startmakeuseralbum'){
       this.startmakeuseralbum = true
+      this.album = []
     }
+
     if(this.getalbum && this.startmakeuseralbum){
+      // let albumModule = app.globalData.moduleobj;
+      let albumModule = this.albumModule
 
-      let albumModule = app.globalData.moduleobj;
-
-      let album = {}
+      let album = this.album
       function sortModule(am1, am2){
         return am1.rank - am2.rank
       }
-      if(albumModule.hasOwnProperty(submodules)){
-        albumModule.submodules.sort(sorModule)
+      if(albumModule.length >0){
+        albumModule.sort(sortModule)
       }
-      if(album.hasOwnProperty(submodules)){
-        album.submodules.sort(sorModule)
-        this.mostforward = album.submodules.length;
+      if(album.length >0){
+        album.sort(sortModule)
+        this.mostforward = album.length;
       }else{
         this.mostforward = -1;
         this.currentIndex = 0;
       }
       // 循环读取 albumModule中的数据
       let submodules = []
-      if(albumModule.hasOwnProperty(submodules) && album.hasOwnProperty(submodules)){
+      if(albumModule.length >0 && album.length >0){
         let i = 0
         let j = 0
-        while (i< albumModule.submodules.length && j<album.submodules.length){
-          let subm1 = albumModule.submodules[i]
-          let subm2 = album.submodules[j]
+        while (i< albumModule.length && j<album.length){
+          let subm1 = albumModule[i]
+          let subm2 = album[j]
           if(subm1.rank === subm2.rank){
             subm1.userOriginImgUrl = subm2.userOriginImgUrl
             subm1.previewImgUrl = subm2.editImageInfos
@@ -161,9 +195,10 @@ let pageData = {
           }
         }
       }
-      for(let amodule of albumModule.submodules){
+      for(let amodule of albumModule){
         let submodule = {}
         submodule.bgsrc = amodule.editImgUrl;
+
         submodule.elesrc = amodule.previewImgUrl
         submodule.translatex = amodule.editImgInfos.positionX
         submodule.translatey = amodule.editImgInfos.positionY
@@ -173,28 +208,65 @@ let pageData = {
 
         submodule.scalex = amodule.editImgInfos.width / this.width
         submodule.scaley = amodule.editImgInfos.height / this.height
+// >>>>>>> v02
+//         submodule.elesrc = amodule.userOriginImgUrl
+//         if(submodule.elesrc == undefined || submodule.elesrc == ""){
+//           submodule.elesrc = amodule.previewImgUrl
+//         }
+//         let editImgInfos = JSON.parse(amodule.editImgInfos)
+//         submodule.translatex = editImgInfos.positionX
+//         submodule.translatey = editImgInfos.positionY
+//         submodule.rotate = editImgInfos.rotate
+//
+//         submodule.width = editImgInfos.width
+//         submodule.height = editImgInfos.height
+//
+//         submodule.scalex = editImgInfos.width / this.width
+//         submodule.scaley = editImgInfos.height / this.height
+
         submodule.rank = amodule.rank
-        submodule.elecount = 1
+        submodule.elecount = amodule.editCount
+        submodule.choosed = false;
         submodules.push(submodule)
       }
 
       this.setData({
         submodules: submodules
       })
-
       // this.loadStorage();
       this.init(this.currentIndex)
       wx.hideToast()
     }
   },
   beforeInit: function(option){
-    this.albumId = option.id;
+    // 读取传入和本地数据
+    this.albumId = option.albumId;
     this.userId = wx.getStorageSync('userId');
+    // 虚拟默认值
+    this.albumId = 1
+    this.userId = "abc"
+
     this.currentIndex = wx.getStorageSync("currentIndex")||0
+
     this.width = 300;
     this.height = 200;
+
     this.cont_width = app.globalData.windowWidth
     this.cont_height = app.globalData.windowHeight
+// >>>>>>> v02
+//     this.windowWidth = app.globalData.windowWidth;
+//     this.windowHeight = app.globalData.windowHeight;
+//     //设置bg图片的位置 周围的预留边界
+//     this.bg_tr_x = 40
+//     this.bg_tr_y = 40
+  },
+  requestfailed: function(res){
+    wx.showModal({
+      title:"提示",
+      content: "网络错误，请稍后再试！"
+    })
+    wx.hideToast()
+
   },
   onLoad: function(option){
     // let optionId = "abc";
@@ -213,13 +285,14 @@ let pageData = {
         id:this.albumId
       },
       success:function(res){
-        console.log(res);
+        console.log("getalbum", res);
+        that.requestcontinue("getalbum", res)
       },
       fail: function(res){
-        console.log(res);
+        console.log("getalbum", res);
+        that.requestfailed(res)
       },
       complete: function(res){
-        console.log(res);
         if(!debug){return}
         that.requestcontinue("getalbum", res)
       }
@@ -232,13 +305,14 @@ let pageData = {
         albumId: this.userId
       },
       success:function(res){
-        console.log(res)
+        console.log("startmakeuseralbum", res)
+        that.requestcontinue("startmakeuseralbum", res)
       },
       fail:function(res){
-        console.log(res)
+        console.log("startmakeuseralbum", res)
+        that.requestfailed(res)
       },
       complete: function(res){
-        console.log(res)
         if(!debug){return}
         that.requestcontinue("startmakeuseralbum", res)
       }
@@ -262,32 +336,54 @@ let pageData = {
         that.choosed = true;
         that.mostforward = index > that.mostforward? index: that. mostforward
         that.data.submodules[index].elesrc = res.tempFilePaths[0]
+        that.data.submodules[index].choosed = true
         that.setData({
-          submodules: that.data.submodules
+          submodules: that.data.submodules,
+          choosed: that.choosed
         })
       }
     })
   },
   next: function(e){
-    if(!this.choosed){
-      wx.showModal({
-        title:"提示",
-        content: "请先选择照片",
-        success:function(res){}
-      })
-      return
-    }
+
+    // if(!this.choosed){
+    //   wx.showModal({
+    //     title:"提示",
+    //     content: "请先选择照片",
+    //     success:function(res){}
+    //   })
+    //   return
+    // }
     let index = this.data.index;
     let length = this.data.submodules.length;
 
     this.save(index)
     if(index <length-1){
       this.init(++index)
+    }else{
+      let ok = true;
+      for(let submodule of this.data.submodules){
+        if((!submodule.choosed) && submodule.elecount >0){
+          ok = false
+          wx.showModal({
+            title:"提示",
+            content:"制作未完成，您有模板页未上传图片"
+          })
+        }
+      }
+      if(ok){
+        wx.showModal({
+          title:"提示",
+          content:"制作完成，请返回个人中心查看相册"
+        })
+      }
     }
   },
   back: function(e){
     let index = this.data.index;
-    this.init(--index)
+    if(index >0){
+      this.init(--index)
+    }
 
   },
   touchstart: function(e){
@@ -344,14 +440,15 @@ let pageData = {
       if(this.translatex > this.translateXlimit){
         this.translatex = this.translateXlimit;
       }
-      if(this.translatex < 0){
-        this.translatex = 0;
+      if(this.translatex < this.bg_tr_x){
+        this.translatex = this.bg_tr_x;
       }
+
       if(this.translatey > this.translateYlimit){
         this.translatey = this.translateYlimit;
       }
-      if(this.translatey < 0){
-        this.translatey = 0;
+      if(this.translatey < this.bg_tr_y){
+        this.translatey = this.bg_tr_y;
       }
 
 

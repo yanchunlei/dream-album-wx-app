@@ -1,7 +1,8 @@
-<view class="header">
+<view class="header" hidden="true">
   <view class="next" bindtap="next">{{next}}</view>
   <view class="back" bindtap="back" hidden="{{backhidden}}" >{{back}}</view>
 </view>
+
 <view class="content"  bindtouchstart="containerstart" bindtouchmove="containermove" bindtouchend="containerend">
   <view style="position:absolute;width:{{cont_width}};height:{{cont_height}}" animation="{{container_animation}}">
     <image class="bg_img" style="width:{{cont_width}};height:{{cont_height}}" src="{{submodules[index].bgsrc}}"/>
@@ -14,7 +15,12 @@
 
   </view>
 </view>
-<view class="footer weui-flex" hidden ="{{hiddenfooter}}">
+<view class="footer2">
+<button class="footer2_item" catchtap="back">{{back}}</button>
+<button class="footer2_item" catchtap="next">{{next}}</button>
+</view>
+<view class="footer weui-flex" hidden ="true">
+  <!--hidden ="{{hiddenfooter}}"-->
   <view class="weui-flex__item" >云端</view>
   <view class="weui-flex__item" bindtap="gocreate">创建</view>
   <view class="weui-flex__item" >本地</view>

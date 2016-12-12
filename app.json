@@ -3,7 +3,6 @@
     "pages/create/create",
     "pages/index/index",
     "pages/preview/preview",
-  
     "pages/logs/logs"
   ],
   "window":{

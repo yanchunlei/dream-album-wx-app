@@ -48,3 +48,19 @@
   margin: -40rpx 0;
   z-index:10
 }
+.footer2{
+  position: absolute;
+  width: 100%;
+  text-align: center;
+  color: #1aad19;
+  font-size: 24px;
+  z-index:10;
+  display: flex;
+  height: 55px
+}
+.footer2_item{
+  margin: 0,50px;
+  -webkit-box-flex: 1;
+  -webkit-flex: 1;
+          flex: 1;
+}
