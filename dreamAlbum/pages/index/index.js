@@ -15,9 +15,14 @@ Page({
      })
   },
   confirmUploadImage: function(e, tempFilePaths){
-    console.log(e,tempFilePaths)
+    // console.log(e,tempFilePaths)
     let uploadfailed = false
     let that = this
+    wx.showToast({
+      title: '上传中...',
+      icon: 'loading',
+      duration: 5000
+    })
     for(let i =0; i<tempFilePaths.length && !uploadfailed; i++){
       wx.uploadFile({
         url: app.globalData.serverHost + "/dream/album/common/uploaduserimg.json",
@@ -30,16 +35,21 @@ Page({
           'complete': i===tempFilePaths.length-1?1:0
         },
         success: function (res) {
+          let jsdata = JSON.parse(res.data)
           wx.hideToast()
-          if (i === tempFilePaths.length-1){
+          if (i === tempFilePaths.length-1 && jsdata.status == 0){
+            wx.hideToast()
             wx.redirectTo({
-              url: '../viewswiper/viewswiper?userAlbumId=' + res.userAlbumId
+              url: '../viewswiper/viewswiper?userAlbumId=' + jsdata.data
             })
           }
         },
         fail: function (res) {
           that.requestFailed(res);
           uploadfailed = true
+        },
+        complete: function(res){
+          console.log(res)
         }
       })
     }
@@ -49,7 +59,6 @@ Page({
     wx.chooseImage({
       count: e.currentTarget.dataset.totalitems,
       success: function(res){
-        console.log(res)
         if(res.tempFilePaths.length < e.currentTarget.dataset.totalitems){
           wx.showModal({
             title:"提示",
