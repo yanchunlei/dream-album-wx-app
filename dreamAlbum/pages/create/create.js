@@ -168,7 +168,7 @@ let pageData = {
     if(albumModule.length >0){
       albumModule.sort(sortModule)
     }
-    if(album != 'undefined' && album.length >0){
+    if(album != undefined && album.length >0){
       album.sort(sortModule)
       this.mostforward = album.length;
     }else{
@@ -184,7 +184,9 @@ let pageData = {
         let subm1 = albumModule[i]
         let subm2 = album[j]
         if(subm1.rank === subm2.rank){
+          // 添加上传的图片url
           subm1.userOriginImgUrl = subm2.userOriginImgUrl
+          // 添加元素图片位置信息
           subm1.editElmInfos = subm2.editImgInfos
           i++
           j++
@@ -209,13 +211,29 @@ let pageData = {
       submodule.imgOriWidth = amodule.imgWidth
       submodule.imgOriHeight = amodule.imgHeight
 
+      // 背景可编辑区域的位置信息（shadow 的位置）
       let editImgInfos = this.convertEditImgInfos(false, true, amodule.editImageInfos, submodule.imgOriWidth ,submodule.imgOriHeight)
-      submodule.translatex = editImgInfos.cssElmMoveX
-      submodule.translatey = editImgInfos.cssElmMoveY
-      submodule.rotate = editImgInfos.cssElmRotate
+      submodule.shadowTranslatex = editImgInfos.cssElmMoveX
+      submodule.shadowTranslatey = editImgInfos.cssElmMoveY
+      submodule.shadowRotate = editImgInfos.cssElmRotate
+      submodule.shadowWidth = editImgInfos.cssElmWidth
+      submodule.shadowHeight = editImgInfos.cssElmHeight
 
-      submodule.width = editImgInfos.width
-      submodule.height = editImgInfos.height
+      if(amodule.editElmInfos != undefined){
+        let elmImgInfos = this.convertEditImgInfos(false, true, amodule.editElmInfos, submodule.imgOriWidth, submodule.imgOriHeight)
+        submodule.elmTranslatex = elmImgInfos.cssElmMoveX
+        submodule.elmTranslatey = elmImgInfos.cssElmMoveY
+        submodule.elmRotate = elmImgInfos.cssElmRotate
+        submodule.elmWidth = elmImgInfos.cssElmWidth
+        submodule.elmHeight = elmImgInfos.cssElmHeight
+      }else{
+        submodule.elmTranslatex = submodule.cssElmMoveX
+        submodule.elmTranslatey = submodule.cssElmMoveY
+        submodule.elmRotate = submodule.cssElmRotate
+        submodule.elmWidth = submodule.cssElmWidth
+        submodule.elmHeight = submodule.cssElmHeight
+      }
+
 
       submodule.scalex = editImgInfos.width / this.width
       submodule.scaley = editImgInfos.height / this.height
